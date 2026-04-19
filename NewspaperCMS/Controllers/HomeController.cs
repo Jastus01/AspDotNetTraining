@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using NewspaperCMS.DomainObjects;
+using NewspaperCMS.Helpers;
 using NewspaperCMS.Models;
 using NewspaperCMS.Services;
 
@@ -10,9 +12,17 @@ public class HomeController : Controller
 {
     private readonly INewspaperService _newspaperService;
 
-    public HomeController(INewspaperService newspaperService)
+    public HomeController(IConfiguration configuration, 
+        IOptions<Settings> settings,
+        INewspaperService newspaperService)
     {
         _newspaperService = newspaperService;
+
+        int opinionPieces = configuration.GetValue<int>("Settings:FrontPage:NumberOfFrontPageOpinionPieces");
+
+        int headlines = settings.Value.FrontPage!.NumberOfHeadlineArticles;
+       
+        int i = 0;
     }
     public IActionResult Index()
     {

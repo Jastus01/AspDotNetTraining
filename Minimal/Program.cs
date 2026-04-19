@@ -78,7 +78,6 @@ public class Program
             return TypedResults.Ok();
         });
 
-
         app.MapGet("/todoitems", () =>
             {
                 return Results.Ok(todoItems);
