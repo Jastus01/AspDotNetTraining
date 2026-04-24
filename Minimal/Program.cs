@@ -90,7 +90,32 @@ public class Program
             return Results.Created();
         });
 
+        app.MapPatch("/updateTodoItemDueDate/{id}",
+            (int id, DateTime newDueDate)
+                =>
+            {
+                int index = todoItems.FindIndex(x => x.Id == id);
+                
+                if (index == -1)
+                {
+                    return Results.NotFound();
+                }
 
-    app.Run();
+                todoItems[index].DueDate = newDueDate;
+                return Results.NoContent();
+            });
+
+        app.MapGet("/todoitems/{id}", (int id) =>
+        {
+            var index = todoItems.FindIndex(x => x.Id == id);
+            if (index == -1)
+            {
+                return Results.NotFound();
+            }
+
+            return Results.Ok(todoItems[index]);
+        });
+
+        app.Run();
     }
 }
