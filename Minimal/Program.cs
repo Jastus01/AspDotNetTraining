@@ -108,6 +108,7 @@ public class Program
         app.MapGet("/todoitems/{id}", (int id) =>
         {
             var index = todoItems.FindIndex(x => x.Id == id);
+            
             if (index == -1)
             {
                 return Results.NotFound();
