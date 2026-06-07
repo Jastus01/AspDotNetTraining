@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using Minimal.Filters;
 using Minimal.Models;
 
 namespace Minimal;
@@ -103,11 +105,21 @@ public class Program
 
         app.MapPost("/todoitems", (TodoItem item) =>
         {
+            var validationResults = new List<ValidationResult>();
+            var validationContext = new ValidationContext(item);
+            
+            bool isValid = Validator.TryValidateObject(item, validationContext, validationResults, true);
+
+            if (!isValid)
+            {
+                return Results.BadRequest(validationResults);
+            }
+            
             todoItems.Add(item);
             return Results.Created();
-        });
+        }).AddEndpointFilter<CreateTodoFilter>();
 
-        app.MapPatch("/updateTodoItemDueDate/{id}",
+        app.MapPatch("/updateTodoItemDueDate/{id:int:range(1, 100)}",
             (int id, DateTime newDueDate)
                 =>
             {
@@ -132,6 +144,18 @@ public class Program
             }
 
             return Results.Ok(todoItems[index]);
+        });
+
+        app.MapDelete("/todoitems/{id}", (int id) =>
+        {
+            int index = todoItems.FindIndex(x => x.Id == id);
+            if (index == -1)
+            {
+                return Results.NotFound();
+            }
+            
+            todoItems.RemoveAt(index);
+            return Results.NoContent();
         });
 
         app.Run();
