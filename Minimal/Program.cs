@@ -16,7 +16,7 @@ public class Program
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
+        // Configure the HTTP request pipeline
         if (app.Environment.IsDevelopment())
             app.MapOpenApi();
 
@@ -29,7 +29,24 @@ public class Program
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
+        app.UseMiddleware<MySuperSimpleMiddlwareClass>();
 
+        app.Use(async (context, next) =>
+        {
+            Console.WriteLine("Request handled by inline middleware component");
+            await next(context);
+            Console.WriteLine("Response handled ny inline middleware component");
+        });
+
+        app.Use(async (context, next) =>
+        {
+            Console.WriteLine($"Request : {context.Request.Method} {context.Request.Path}");
+            await next();
+            Console.WriteLine($"Response: {context.Response.StatusCode}");
+        });
+        
+        
+        
         List<TodoItem> todoItems = new();
 
         app.MapGet("/weatherforecast", (HttpContext httpContext) =>
