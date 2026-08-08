@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 using Minimal.Filters;
 using Minimal.Models;
 
@@ -6,6 +7,13 @@ namespace Minimal;
 
 public class Program
 {
+    private static readonly List<string> _blockedIPS = new List<string>
+    {
+        "192.168.1.1",
+        "203.0.113.0",
+        "::1"
+    };
+    
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +31,6 @@ public class Program
             app.MapOpenApi();
 
         app.UseHttpsRedirection();
-
         app.UseAuthorization();
 
         var summaries = new[]
@@ -31,6 +38,8 @@ public class Program
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
+        
+        app.UseMiddleware<IPBlockingMiddleware>(_blockedIPS);
         app.UseMiddleware<MySuperSimpleMiddlwareClass>();
 
         app.Use(async (context, next) =>
@@ -134,6 +143,26 @@ public class Program
                 return Results.NoContent();
             });
 
+        app.MapPatch(
+            "updateToDoItemDueDate",
+            async (HttpRequest request) =>
+            {
+                IFormCollection formData = await request.ReadFormAsync();
+                int id = int.Parse(formData["Id"]);
+                DateTime newDueDate = DateTime.Parse(formData["newDueDate"]);
+
+                var index = todoItems.FindIndex(x => x.Id == id);
+
+                if (index == -1)
+                {
+                    return Results.NotFound();
+                }
+
+                todoItems[index].DueDate = newDueDate;
+                return Results.NoContent();
+            }
+        );
+
         app.MapGet("/todoitems/{id}", (int id) =>
         {
             var index = todoItems.FindIndex(x => x.Id == id);
@@ -156,6 +185,55 @@ public class Program
             
             todoItems.RemoveAt(index);
             return Results.NoContent();
+        });
+
+        app.MapGet(
+            "/todoItems",
+            ([FromQuery(Name = "pastDue")] bool pastDue,
+            [FromQuery(Name = "priority")] int priority) 
+                =>
+            {
+                var todoItemsQuery = todoItems.AsQueryable();
+
+                if (pastDue)
+                {
+                    todoItemsQuery = todoItemsQuery.Where(x => x.DueDate <= DateTime.Now);
+                }
+
+                if (priority > 0)
+                {
+                    todoItemsQuery = todoItemsQuery.Where(x => x.Priority == priority);
+                }
+
+                var result = todoItemsQuery.ToList();
+
+                return Results.Ok(result);
+            }
+            );
+
+        app.MapGet("/todoitema/{id}", (int id, string? assignee) =>
+        {
+            var index = todoItems.FindIndex(x => x.Id == id);
+
+            if (index == -1)
+            {
+                return Results.NotFound();
+            }
+
+            var todoItem = todoItems[index];
+
+            if (assignee != null)
+            {
+                if (todoItem.Assignee != assignee)
+                {
+                    return Results.NotFound();
+                }
+            }
+
+            return Results.Ok(todoItems[index]);
+
+
+            return Results.Ok(todoItem);
         });
 
         app.Run();
