@@ -11,17 +11,30 @@ public class Game
     {
         Room room1 = new()
         {
-            Name = "Outside the gates"
+            Name = "Outside the gates",
+            ShortDescription = "",
+            Description = ""
         };
 
         Room room2 = new()
         {
-            Name = "Inside the gates"
+            Name = "Inside the gates",
+            ShortDescription = "",
+            Description = ""
         };
 
         Room room3 = new()
         {
-            Name = "East side of mansion"
+            Name = "Main Entrance",
+            ShortDescription = "",
+            Description = ""
+        };
+        
+        Room room4 = new()
+        {
+            Name = "East side of mansion",
+            ShortDescription = "",
+            Description = ""
         };
         
         Loop();
@@ -29,6 +42,8 @@ public class Game
 
     private void Loop()
     {
+        //get examine open close unlock n, s, e, w, up, down, climb
+        
         // read command
         // execute command
     }

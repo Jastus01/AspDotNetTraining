@@ -232,9 +232,23 @@ public class Program
 
             return Results.Ok(todoItems[index]);
 
-
             return Results.Ok(todoItem);
         });
+
+        app.MapPost("/todoitems", (TodoItem item,
+            [FromHeader(Name = "TriggerBackgroundTask")]
+            bool triggerBackgroundTaskHeader) =>
+        {
+            if (triggerBackgroundTaskHeader)
+            {
+                // do something in background
+            }
+            
+            todoItems.Add(item);
+            return Results.Created();
+        });
+        
+        
 
         app.Run();
     }

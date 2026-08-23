@@ -4,12 +4,18 @@ public class Room
 {
     //items
     //exits
-    public int Description
+    public required string Description
+    {
+        get;
+        set;
+    }
+
+    public required string ShortDescription
     {
         get;
         set;
     }
     
-    public string Name { get; set; }
+    public required string Name { get; set; }
     //description short
 }
