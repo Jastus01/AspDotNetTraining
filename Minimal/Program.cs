@@ -24,6 +24,8 @@ public class Program
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
 
+        builder.Services.AddSingleton<TodoItemService>();
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline
@@ -247,8 +249,14 @@ public class Program
             todoItems.Add(item);
             return Results.Created();
         });
-        
-        
+
+        app.MapGet("/todoItems", (
+            [FromQuery(Name="pastDue")] bool pastDue, 
+            [FromQuery(Name="priority")] int priority,
+            [FromServices] TodoItemService todoItemService) =>
+        {
+            return Results.Ok(todoItemService.GetTodoItems(pastDue, priority));
+        });
 
         app.Run();
     }
