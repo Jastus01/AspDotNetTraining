@@ -36,6 +36,8 @@ public class HomeController : Controller
         
         return View(article);
     }
+    
+    
 
     public IActionResult Privacy()
     {
