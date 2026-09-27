@@ -1,4 +1,4 @@
-namespace Minimal;
+namespace Minimal2;
 
 public class Order
 {

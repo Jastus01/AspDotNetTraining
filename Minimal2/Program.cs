@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
+
 namespace Minimal2;
 
 public class Program
@@ -5,6 +7,8 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddMyServices();
 
         // Add services to the container.
         builder.Services.AddAuthorization();
@@ -42,6 +46,30 @@ public class Program
                 return forecast;
             })
             .WithName("GetWeatherForecast");
+
+        app.MapGet("/getProductById/{id}", (
+                int id,
+                [FromServices] ProductRetrievalService productRetrievalService
+                ) =>
+            {
+                var productRepository = new ProductRepository(productRetrievalService);
+
+                return Results.Ok(productRepository.Products.FirstOrDefault(x => x.Id == id));
+            }
+        );
+
+        app.MapPost(
+            "/order",
+            (Order order, 
+                    [FromServices] DeliveryDateBookingService deliveryDateBookingService,
+                    [FromServices] OrderRepository orderRepository) =>
+            {
+                order.DeliveryDate = deliveryDateBookingService.GetNextAvailableDate();
+                orderRepository.SaveOrder(order);
+
+            });
+        
+        
 
         app.Run();
     }

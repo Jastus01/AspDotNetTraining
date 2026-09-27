@@ -1,10 +1,10 @@
 using System.Text.Json;
 
-namespace Minimal;
+namespace Minimal2;
 
 public class ProductRetrievalService
 {
-  public List<Product>? LoadProducts()
+  public List<Product> LoadProducts()
   {
     return JsonSerializer.Deserialize<List<Product>>(Data);
   }
