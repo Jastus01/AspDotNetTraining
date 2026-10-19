@@ -8,6 +8,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<DeliveryDateBookingService>();
         services.AddScoped<OrderRetrievalService>();
         services.AddSingleton<OrderRepository>();
+        services.AddSingleton<SomeInternalService>();
         
         return services;
     }

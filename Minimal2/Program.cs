@@ -68,9 +68,45 @@ public class Program
                 orderRepository.SaveOrder(order);
 
             });
-        
+
+        app.MapGet("/fetch-data-async-await", async (HttpContext HttpContext) =>
+        {
+            HttpClient client = new();
+
+            string url = "https://jsonplaceholder.typicode.com/posts/1";
+
+            try
+            {
+                string data = await client.GetStringAsync(url);
+
+                await HttpContext.Response.WriteAsJsonAsync(new { data });
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+                await HttpContext.Response.WriteAsJsonAsync(new
+                {
+                    error = ": " + ex.Message
+                });
+            }
+        });
+
+        app.MapGet("minimal-endpoint-inline", () => "GET!");
+        app.MapGet("minimal-endpoint-inline2", MyMethod);
+        void MyMethod(){};
         
 
-        app.Run();
+        app.MapGet("minimal-endpoint-inline3/{id}", ([FromRoute] int id) => $"The id was {id}");
+        app.MapGet("minimal-endpoint-inline4{value}", (String value, SomeInternalService service) =>
+        {
+            service.Respond(value);
+        });
     }
+}
+
+public class SomeInternalService
+{
+    public string Respond(string value) => $"The value was {value}";
+
 }
