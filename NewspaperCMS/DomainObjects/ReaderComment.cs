@@ -7,4 +7,5 @@ public class ReaderComment
     //text
     //user
     //is flagged
+    //time stamp
 }
