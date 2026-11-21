@@ -1,0 +1,8 @@
+###
+@MinimalTwitter_HostAddress = https://localhost:7131
+
+
+GET {{MinimalTwitter_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
